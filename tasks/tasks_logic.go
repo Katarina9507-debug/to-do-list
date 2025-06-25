@@ -27,17 +27,17 @@ func (storage *TaskStorage) AddTask(task Task) error {
 	return nil
 }
 
-func (storage *TaskStorage) DeleteTask(task Task) error {
+func (storage *TaskStorage) DeleteTask(id uint) error {
 	if storage == nil {
 		return fmt.Errorf(errors.ErrStorageNil)
 	}
 
-	index, err := storage.GetSliceIndex(task)
+	index, err := storage.GetSliceIndex(id)
 	if err != nil {
 		return &errors.MyErrors{
 			Method: "DeleteTask",
 			Code:   404,
-			Msg:    fmt.Sprintf(errors.ErrTaskNotFound, task.ID),
+			Msg:    fmt.Sprintf(errors.ErrTaskNotFound, id),
 		}
 	}
 	*storage = slices.Delete(*storage, index, index+1)
@@ -45,18 +45,18 @@ func (storage *TaskStorage) DeleteTask(task Task) error {
 	return nil
 }
 
-func (storage *TaskStorage) GetSliceIndex(task Task) (int, error) {
+func (storage *TaskStorage) GetSliceIndex(id uint) (int, error) {
 	if storage == nil {
 		return -1, fmt.Errorf(errors.ErrStorageNil)
 	}
 
 	for index, item := range *storage {
-		if task.ID == item.ID {
+		if item.ID == id {
 			return index, nil
 		}
 	}
 
-	return -1, fmt.Errorf(errors.ErrIndexNotFound, task.ID)
+	return -1, fmt.Errorf(errors.ErrIndexNotFound, id)
 }
 
 func (storage *TaskStorage) MarkTaskAsDone(isDone bool, taskID uint) error {
