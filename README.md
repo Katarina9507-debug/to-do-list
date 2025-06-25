@@ -20,5 +20,5 @@
 
 1. Клонируйте репозиторий:
 ```bash
-git clone https://github.com/yourusername/to-do-list.git
+git clone https://github.com/Katarina9507-debug/to-do-list.git
 cd to-do-list
