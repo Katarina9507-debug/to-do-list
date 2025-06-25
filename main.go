@@ -41,8 +41,8 @@ func main() {
 			task.ID, task.Name, task.Status)
 	}
 
-	// удаляем задачу, в случае её отсутсвия логируем ошибку
-	if err := storage.DeleteTask(tasks.Task{ID: 3}); err != nil {
+	// удаляем задачу по ID, в случае её отсутсвия логируем ошибку
+	if err := storage.DeleteTask(3); err != nil {
 		log.Printf("Ошибка удаления: %v", err)
 	} else {
 		log.Println("Задача успешно удалена")
