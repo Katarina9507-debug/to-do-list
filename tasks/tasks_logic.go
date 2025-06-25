@@ -93,3 +93,23 @@ func (storage *TaskStorage) ListTasks() {
 		fmt.Printf("[%d] %s - %s\n", task.ID, task.Name, isDone)
 	}
 }
+
+// метод поиска задач по ID
+func (storage *TaskStorage) FindTaskByID(taskID uint) (Task, error) {
+	if storage == nil {
+		return Task{}, fmt.Errorf(errors.ErrStorageNil)
+	}
+
+	var task Task
+	for _, item := range *storage {
+		if item.ID == taskID {
+			task = Task{item.ID, item.Name, item.Status}
+			return task, nil
+		}
+	}
+	return Task{}, &errors.MyErrors{
+		Method: "FindTaskByID",
+		Code:   404,
+		Msg:    fmt.Sprintf(errors.ErrTaskNotFound, taskID),
+	}
+}
