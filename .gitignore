@@ -1,5 +1,6 @@
 .DS_Store
-.idea/vcs.xml
 .idea/.gitignore
-.idea/modules.xml
-.idea/to-do list.iml
+
+.idea/
+*.iml
+*.xml
