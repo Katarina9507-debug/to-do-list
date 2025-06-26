@@ -50,5 +50,7 @@ func main() {
 
 	// выводим список существющих задач
 	fmt.Println("\nТекущий список задач:")
-	storage.ListTasks()
+	if err := storage.ListTasks(); err != nil {
+		log.Printf("Ошибка получения списка задач: ")
+	}
 }

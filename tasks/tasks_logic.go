@@ -79,19 +79,24 @@ func (storage *TaskStorage) MarkTaskAsDone(isDone bool, taskID uint) error {
 	}
 }
 
-func (storage *TaskStorage) ListTasks() {
+func (storage *TaskStorage) ListTasks() error {
 	if storage == nil {
-		fmt.Errorf(errors.ErrStorageNil)
-		return
+		return fmt.Errorf(errors.ErrStorageNil)
 	}
 
-	isDone := "Не выполнено"
+	if len(*storage) == 0 {
+		fmt.Println("Список задач пуст")
+		return nil
+	}
+
 	for _, task := range *storage {
+		isDone := "Не выполнено"
 		if task.Status {
 			isDone = "Выполнено"
 		}
 		fmt.Printf("[%d] %s - %s\n", task.ID, task.Name, isDone)
 	}
+	return nil
 }
 
 // метод поиска задач по ID
