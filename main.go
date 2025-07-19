@@ -4,53 +4,49 @@ import (
 	"fmt"
 	"log"
 
-	"to-do_list/tasks"
+	"to-do_list/infrastructure/db"
+	"to-do_list/repository"
+	"to-do_list/services"
 )
 
 func main() {
-	storage := &tasks.TaskStorage{}
+	// Подключение к базе
+	database, err := db.New("config/config.json")
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	defer database.Conn.Close()
 
-	// создаем слайс задач
-	tasksToAdd := []tasks.Task{
-		{ID: 1, Name: "Завершить учебный проект", Status: false},
-		{ID: 2, Name: "Протестировать код", Status: false},
-		{ID: 3, Name: "Обновить документацию", Status: false},
+	// Инициализация базы данных
+	if err := db.InitializeDB(database.Conn); err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
-	// циклом добавляем все задачи в хранилище
-	for _, task := range tasksToAdd {
-		if err := storage.AddTask(task); err != nil {
-			log.Printf("Ошибка добавления задачи %d: %v", task.ID, err)
-		} else {
-			log.Printf("Задача добавлена: [%d] %s", task.ID, task.Name)
-		}
+	// Создание  репы и сервиса
+	taskRepo := repository.NewTaskRepository(database.Conn)
+	taskService := services.NewTaskService(taskRepo)
+
+	if err := taskService.AddTask("Завершить учебный проект"); err != nil {
+		log.Printf("Failed to add task: %v", err)
 	}
 
-	// отмечаем задачу как выполненную, в случае её отсутсвия логируем ошибку
-	if err := storage.MarkTaskAsDone(true, 1); err != nil {
-		log.Printf("Ошибка отметки задачи: %v", err)
-	} else {
-		log.Printf("Задача отмечена как выполненная")
+	// Удаление задачи по ID
+	if err := taskService.DeleteTask(2); err != nil {
+		log.Printf("Failed to delete task: %v", err)
 	}
 
-	// ищем задачу по ID
-	if task, err := storage.FindTaskByID(2); err != nil {
-		log.Printf("Ошибка поиска: %v", err)
-	} else {
-		fmt.Printf("Найдена задача: [%d] %s - %v\n",
-			task.ID, task.Name, task.Status)
+	// Отметка о выполнении задачи
+	if err := taskService.MarkTaskAsDone(11); err != nil {
+		log.Printf("Failed to mark task as done: %v", err)
 	}
 
-	// удаляем задачу по ID, в случае её отсутсвия логируем ошибку
-	if err := storage.DeleteTask(3); err != nil {
-		log.Printf("Ошибка удаления: %v", err)
-	} else {
-		log.Println("Задача успешно удалена")
+	// Вывод списка задач
+	tasks, err := taskService.ListTasks()
+	if err != nil {
+		log.Printf("Failed to list tasks: %v", err)
 	}
 
-	// выводим список существющих задач
-	fmt.Println("\nТекущий список задач:")
-	if err := storage.ListTasks(); err != nil {
-		log.Printf("Ошибка получения списка задач: ")
+	for _, task := range tasks {
+		fmt.Printf("%d. %s (Выполнено: %t)\n", task.ID, task.Name, task.Status)
 	}
 }
