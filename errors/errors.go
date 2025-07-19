@@ -7,6 +7,7 @@ const (
 	ErrTaskExists    = "task with ID %d already exist"
 	ErrTaskNotFound  = "task with ID %d not found"
 	ErrIndexNotFound = "index %d not found"
+	ErrInsertingTask = "error inserting task"
 )
 
 type MyErrors struct {
